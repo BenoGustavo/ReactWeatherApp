@@ -1,0 +1,12 @@
+body {
+    overflow-y: hidden;
+    background-size: cover;
+    background-repeat: no-repeat;
+}
+
+.mainContainer {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    height: calc(100vh - 70px);
+}
