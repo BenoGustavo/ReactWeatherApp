@@ -2,11 +2,22 @@ body {
     overflow-y: hidden;
     background-size: cover;
     background-repeat: no-repeat;
+    height: 100svh;
+    width: 100%;
 }
 
 .mainContainer {
     display: flex;
     flex-direction: column;
     justify-content: center;
-    height: calc(100vh - 70px);
+    height: calc(100svh - 70px);
+}
+
+#root {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    max-height: 100svh;
+    max-width: 100svw;
 }

@@ -32,7 +32,6 @@ export class App extends React.Component<{}, AppState> {
       <>
         <main className='mainContainer'>
           <RegionSelect
-            region={this.state.region}
             onRegionChange={this.handleRegionChange}
             onCityChange={this.handleCityChange}
           />

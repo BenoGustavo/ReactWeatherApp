@@ -13,7 +13,7 @@
     text-decoration: none;
     color: black;
     font-weight: 500;
-    filter: opacity(0.2);
+    filter: opacity(0.5);
     transition: ease-in-out 0.3s;
     font-size: 0.8rem;
 }
@@ -30,4 +30,37 @@
 .footerContainer ul img {
     width: 35px;
     height: 35px;
+}
+
+/* Media queries for responsiveness */
+@media (max-width: 768px) {
+    .footerContainer ul {
+        gap: 2rem; /* Reduce gap for smaller screens */
+        margin-bottom: 1.5rem;
+    }
+
+    .footerContainer ul li a {
+        font-size: 0.7rem; /* Reduce font size for smaller screens */
+    }
+
+    .footerContainer ul img {
+        width: 30px;
+        height: 30px; /* Reduce image size for smaller screens */
+    }
+}
+
+@media (max-width: 480px) {
+    .footerContainer ul {
+        gap: 1rem; /* Further reduce gap */
+        margin-bottom: 1rem;
+    }
+
+    .footerContainer ul li a {
+        font-size: 0.6rem; /* Further reduce font size */
+    }
+
+    .footerContainer ul img {
+        width: 25px;
+        height: 25px; /* Further reduce image size */
+    }
 }
