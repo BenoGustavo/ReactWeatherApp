@@ -1,81 +1,90 @@
-import React from "react";
-import braziliamStates from "../../assets/json/states.json"
-import "./style.css"
-import { saveOnLocalStorage, loadLocalStorage } from "../../utils/localStorageController"
-
-type State = {
-    sigla: string;
-    nome: string;
-    cidades: string[];
-  };
-  
-  type Country = {
-    estados: State[];
-  };
+import React, { useState, useEffect } from "react";
+import brazilianStates from "../../assets/json/states.json";
+import "./style.css";
+import { saveOnLocalStorage, loadLocalStorage } from "../../utils/localStorageController";
+import { Country, State } from "../../types/types";
+import { binarySearch } from "../../utils/binarySearch";
 
 type RegionSelectProps = {
-    region: string;
     onRegionChange: (region: string) => void;
     onCityChange: (city: string) => void;
 };
 
-export class RegionSelect extends React.Component<RegionSelectProps> {
-    regionJson: { [key: string]: string[] };
+export const RegionSelect: React.FC<RegionSelectProps> = ({ onRegionChange, onCityChange }) => {
+    const regionJson: Country = brazilianStates;
 
-    constructor(props: RegionSelectProps) {
-        super(props);
-        this.regionJson = braziliamStates;
+    // Default values
+    const defaultRegion = "SC";
+    const defaultCity = "Florianópolis";
 
-        const regionLocalStorage = loadLocalStorage('region')
-        const cityLocalStorage = loadLocalStorage('city')
+    const [selectedRegion, setSelectedRegion] = useState<string>(defaultRegion);
+    const [selectedCity, setSelectedCity] = useState<string>(defaultCity);
+
+    useEffect(() => {
+        const regionLocalStorage = loadLocalStorage('region');
+        const cityLocalStorage = loadLocalStorage('city');
 
         if (regionLocalStorage && cityLocalStorage) {
-            this.props.onRegionChange(regionLocalStorage);
-            this.props.onCityChange(cityLocalStorage);
+            onRegionChange(regionLocalStorage);
+            onCityChange(cityLocalStorage);
+            setSelectedRegion(regionLocalStorage);
+            setSelectedCity(cityLocalStorage);
+            return;
         }
-    }
+        
+        onRegionChange(defaultRegion);
+        onCityChange(defaultCity);
+        saveOnLocalStorage('region', defaultRegion);
+        saveOnLocalStorage('city', defaultCity);
 
-    handleRegionChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    }, [onRegionChange, onCityChange]);
+
+    const handleRegionChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
         const region = event.target.value;
-        this.props.onRegionChange(region);
-        this.props.onCityChange(this.regionJson[region][0]);
+        onRegionChange(region);
+        setSelectedRegion(region);
+
+        const arrPosition = binarySearch(regionJson.estados, region);
+        const firstCity = regionJson.estados[arrPosition].cidades[0];
+        onCityChange(firstCity);
+        setSelectedCity(firstCity);
 
         saveOnLocalStorage('region', region);
-        saveOnLocalStorage('city', this.regionJson[region][0]);
+        saveOnLocalStorage('city', firstCity);
     };
 
-    handleCityChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-        this.props.onCityChange(event.target.value);
+    const handleCityChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+        const city = event.target.value;
+        onCityChange(city);
+        setSelectedCity(city);
 
-        saveOnLocalStorage('city', event.target.value);
+        saveOnLocalStorage('city', city);
     };
 
-    render() {
-        return (
-            <section className="FormContainer">
-                <form>
-                    <div className="state">
-                        <label htmlFor="region">Estados:</label>
-                        <select id="region" name="region" value={this.props.region} onChange={this.handleRegionChange}>
-                            {Object.keys(this.regionJson).map((region) => (
-                                <option key={region} value={region}>
-                                    {region}
-                                </option>
-                            ))}
-                        </select>
-                    </div>
-                    <div className="city">
-                        <label htmlFor="citie">Cidades:</label>
-                        <select id="citie" name="citie" onChange={this.handleCityChange}>
-                            {this.regionJson[this.props.region].map((city) => (
-                                <option key={city} value={city}>
-                                    {city}
-                                </option>
-                            ))}
-                        </select>
-                    </div>
-                </form>
-            </section>
-        );
-    }
-}
+    return (
+        <section className="FormContainer">
+            <form>
+                <div className="state">
+                    <label htmlFor="region">Estados:</label>
+                    <select id="region" name="region" value={selectedRegion} onChange={handleRegionChange}>
+                        {regionJson.estados.map((region: State) => (
+                            <option key={region.sigla} value={region.sigla}>
+                                {region.sigla}
+                            </option>
+                        ))}
+                    </select>
+                </div>
+                <div className="city">
+                    <label htmlFor="citie">Cidades:</label>
+                    <select id="citie" name="citie" value={selectedCity} onChange={handleCityChange}>
+                        {regionJson.estados.find(state => state.sigla === selectedRegion)?.cidades.map((city) => (
+                            <option key={city} value={city}>
+                                {city}
+                            </option>
+                        ))}
+                    </select>
+                </div>
+            </form>
+        </section>
+    );
+};
